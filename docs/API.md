@@ -168,6 +168,18 @@
  */
 ```
 
+### getTransactionCount
+
+```javascript
+/**
+ * get transaction count
+ *
+ * @param {string} address moac address
+ * @returns {Promise<number>} transaction count
+ * @memberof Moac
+ */
+```
+
 ### getTx
 
 ```javascript
