@@ -45,87 +45,89 @@ Breaking changes since 0.1.8, if you used 0.1.7 see [this demo](https://github.c
 // demo
 import { Fingate, Moac, ERC20 } from "jcc-moac-utils";
 
-// Moac node
-const node = "https://moac1ma17f1.jccdex.cn";
+(async () => {
+  // Moac node
+  const node = "https://moac1ma17f1.jccdex.cn";
 
-// Production network or not
-const production = true;
+  // Production network or not
+  const production = true;
 
-// Your moac secret
-const moacSecret = "";
+  // Your moac secret
+  const moacSecret = "";
 
-// Your moac address
-const moacAddress = "";
+  // Your moac address
+  const moacAddress = "";
 
-// Your swtc address
-const swtcAddress = "";
+  // Your swtc address
+  const swtcAddress = "";
 
-// Deposit amount
-const amount = 1;
+  // Deposit amount
+  const amount = 1;
 
-// Moac fingate contract address, don't change it.
-const scAddress = "0x66c9b619215db959ec137ede6b96f3fa6fd35a8a";
+  // Moac fingate contract address, don't change it.
+  const scAddress = "0x66c9b619215db959ec137ede6b96f3fa6fd35a8a";
 
-try {
-  // deposit 1 MOAC
-  const moac = new Moac(node, production);
-  moac.initChain3();
+  try {
+    // deposit 1 MOAC
+    const moac = new Moac(node, production);
+    moac.initChain3();
 
-  const fingateInstance = new Fingate();
-  fingateInstance.init(scAddress, moac);
+    const fingateInstance = new Fingate();
+    fingateInstance.init(scAddress, moac);
 
-  // Check if has pending order, if has don't call the next deposit api
-  const state = await fingateInstance.depositState(moacAddress);
+    // Check if has pending order, if has don't call the next deposit api
+    const state = await fingateInstance.depositState(moacAddress);
 
-  if (fingateInstance.isPending(state)) {
-    return;
+    if (fingateInstance.isPending(state)) {
+      return;
+    }
+
+    // start to transfer 1 MOAC to fingate address
+    const hash = await fingateInstance.deposit(swtcAddress, amount, moacSecret);
+    console.log(hash);
+  } catch (error) {
+    console.log(error);
   }
 
-  // start to transfer 1 MOAC to fingate address
-  const hash = await fingateInstance.deposit(swtcAddress, amount, moacSecret);
-  console.log(hash);
-} catch (error) {
-  console.log(error);
-}
+  // deposit erc20 token
 
-// deposit erc20 token
+  try {
+    // deposit 1 CKM
 
-try {
-  // deposit 1 CKM
+    // CKM contract address
+    const ckmContractAddress = "0x4d206d18fd036423aa74815511904a2a40e25fb1";
 
-  // CKM contract address
-  const ckmContractAddress = "0x4d206d18fd036423aa74815511904a2a40e25fb1";
+    const moac = new Moac(node, production);
+    moac.initChain3();
 
-  const moac = new Moac(node, production);
-  moac.initChain3();
+    const fingateInstance = new Fingate();
+    fingateInstance.init(scAddress, moac);
 
-  const fingateInstance = new Fingate();
-  fingateInstance.init(scAddress, moac);
+    const erc20Instance = new ERC20();
+    erc20Instance.init(ckmContractAddress, moac);
 
-  const erc20Instance = new ERC20();
-  erc20Instance.init(ckmContractAddress, moac);
+    // Check if has pending order, if has don't call transfer api
+    const state = await fingateInstance.depositState(moacAddress, ckmContractAddress);
 
-  // Check if has pending order, if has don't call transfer api
-  const state = await fingateInstance.depositState(moacAddress, ckmContractAddress);
+    if (fingateInstance.isPending(state)) {
+      return;
+    }
 
-  if (inst.isPending(state)) {
-    return;
+    // The first step to transfer 1 CKM to fingate address.
+    const transferHash = await erc20Instance.transfer(moacSecret, scAddress, amount);
+
+    // The next step to submit previous transfer hash.
+    const depositHash = await fingateInstance.depositToken(swtcAddress, ckmContractAddress, erc20Instance.decimals(), amount, transferHash, moacSecret);
+    console.log(depositHash);
+
+    // Warning:
+    // This is not an atomic operating to deposit erc20 tokens for now,
+    // If the first step is successful but next step is failed, please contact us.
+    // The next version will make it an atomic operating after the next version of solidity contract upgrade.
+  } catch (error) {
+    console.log(error);
   }
-
-  // The first step to transfer 1 CKM to fingate address.
-  const transferHash = await erc20Instance.transfer(moacSecret, scAddress, amount);
-
-  // The next step to submit previous transfer hash.
-  const depositHash = await fingateInstance.depositToken(swtcAddress, ckmContractAddress, erc20Instance.decimals(), amount, transferHash, moacSecret);
-  console.log(depositHash);
-
-  // Warning:
-  // This is not an atomic operating to deposit erc20 tokens for now,
-  // If the first step is successful but next step is failed, please contact us.
-  // The next version will make it an atomic operating after the next version of solidity contract upgrade.
-} catch (error) {
-  console.log(error);
-}
+})();
 ```
 
 ## API
