@@ -20,7 +20,8 @@ const config = {
       "base-x": path.resolve(__dirname, "node_modules/base-x"),
       "safe-buffer": path.resolve(__dirname, "node_modules/string_decoder/node_modules/safe-buffer"),
       utf8: path.resolve(__dirname, "node_modules/web3-utils/node_modules/utf8"),
-      "js-sha3": path.resolve(__dirname, "node_modules/ethereum-bloom-filters/node_modules/js-sha3")
+      "js-sha3": path.resolve(__dirname, "node_modules/ethereum-bloom-filters/node_modules/js-sha3"),
+      inherits: path.resolve(__dirname, "node_modules/inherits")
     }
   },
   mode: process.env.MODE === "dev" ? "development" : "production",
