@@ -91,7 +91,7 @@ class ERC20 extends SmartContract {
   public async balanceOf(address: string): Promise<string> {
     const bnBalance = await super.callABI("balanceOf", address);
     const decimals = await this.decimals();
-    const balance = bnBalance.dividedBy(10 ** decimals).toString(10);
+    const balance = new BigNumber(bnBalance).dividedBy(10 ** decimals).toString(10);
     return balance;
   }
 
